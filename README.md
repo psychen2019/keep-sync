@@ -1,101 +1,121 @@
-# Keep Sync — Keep 运动数据同步
+# Keep Sync · Personal Activity Intelligence
 
-从 Keep APP 自动同步所有运动数据到 GitHub 仓库，供 Agent 读取和调用。
+把 Keep 从“运动记录 App”变成一个 **Git-native、AI-readable、可长期演化的个人运动时间序列系统**。
 
-## 数据格式
+核心原则：**源数据尽量无损保存；标准化与分析可重复生成；Agent 分层读取；事实与解释分离。** Keep 只是当前 Adapter，不是最终的数据模型。
 
-### Agent 摘要 `data/agent_summary.json`
+## 数据流水线
 
-**Agent 默认优先读取这个文件。** 它是由 `generate_summary.py` 从完整运动数据自动生成的轻量摘要，避免每次为了回答趋势问题读取体积较大的 `data/data.json`。
-
-目前以 `VirtualRide` 作为主要运动类型，并标记为“动感单车 / 室内骑行”。摘要包含：
-
-- 全部运动次数、日期范围和运动类型分布；
-- 动感单车历史总次数、总分钟数、单次平均时长和平均心率；
-- 按年、按月的动感单车次数、总时长和平均心率；
-- 最近 20 次动感单车；
-- 最近 20 条全部运动记录。
-
-对于“最近运动得怎么样”“今年骑了多少”“哪几个月最规律”“最近一次动感单车是什么时候”这类问题，先读 `data/agent_summary.json`；只有需要更细的单次记录、轨迹或摘要中没有的字段时，再读完整数据。
-
-### SQLite 数据库 `data/data.db`
-
-```sql
-CREATE TABLE activities (
-  run_id INTEGER PRIMARY KEY,
-  name VARCHAR,
-  distance FLOAT,
-  moving_time DATETIME,
-  elapsed_time DATETIME,
-  type VARCHAR,
-  subtype VARCHAR,
-  start_date VARCHAR,
-  start_date_local VARCHAR,
-  location_country VARCHAR,
-  summary_polyline VARCHAR,
-  average_heartrate FLOAT,
-  average_speed FLOAT,
-  elevation_gain FLOAT
-);
+```text
+Keep private API
+  ↓
+data/raw/                 原始 API 响应（source evidence）
+  ↓
+data.db + data.json       稳定活动模型 / 兼容层
+  ↓
+build_intelligence.py     确定性统计与个人基线
+  ↓
+agent_context.json        Agent 默认入口
+  ├─ metrics/monthly.json
+  ├─ metrics/yearly.json
+  └─ normalized/activities.jsonl
+  ↓
+Joi / Codex / other agents
 ```
 
-### 完整 JSON `data/data.json`
+## Agent 读取协议
 
-包含所有活动的完整导出数据。适合需要 session-level 明细的分析，不再作为 Agent 日常趋势查询的首选入口。
+**默认只读 `data/agent_context.json`。** 它回答最近 7/30/90/365 天运动量、最近一次运动、动感单车状态、历史分布、个人描述性基线等常见问题。
 
-### GPX 文件
+需要长期趋势时读取 `data/metrics/monthly.json` 或 `yearly.json`；需要逐次分析时读取 `data/normalized/activities.jsonl`；需要核查 Keep 原始字段时最后下钻 `data/raw/<sport_type>/<id>.json`。不要为了一个简单趋势问题把整个原始历史塞进 LLM context。
 
-GPS 轨迹文件保存在 `data/` 中，可用于地图和室外运动轨迹分析。
+`VirtualRide` 在本仓库语义中对应 Keep `indoorCycling`，即主要运动“动感单车 / 室内骑行”。
 
-## Agent 调用方式
+## Keep API Adapter
 
-### 默认：读取轻量摘要
+当前逆向接口：
+
+```text
+POST https://api.gotokeep.com/v1.1/users/login
+GET  https://api.gotokeep.com/pd/v3/stats/detail?dateUnit=all&type=<type>&lastDate=<cursor>
+GET  https://api.gotokeep.com/pd/v3/<type>log/<run_id>
+```
+
+同步域：`running`、`hiking`、`cycling`、`training`。这些是 Keep 的非公开内部接口，可能随 App 更新变化，因此所有 Keep-specific 代码应限制在 ingestion 层。
+
+## 无损 Raw Layer
+
+新同步的每条详情会保存完整 API envelope：
+
+```text
+data/raw/running/<id>.json
+data/raw/cycling/<id>.json
+data/raw/training/<id>.json
+data/raw/hiking/<id>.json
+```
+
+这样未来发现新的 Keep 字段时可以重新解析，而不必依赖 API 永远可用。历史记录首次升级时，可在 Actions 手动运行并勾选 `refresh_raw`，重新抓取全部历史详情并建立 raw archive。
+
+> Raw 文件可能包含位置、轨迹及 Keep 返回的其他个人运动信息。仓库若公开，请把它视为个人数据发布面并自行决定可接受的暴露范围。
+
+## 标准化字段
+
+SQLite / `data.json` 在旧字段基础上增加：`keep_log_id`、`keep_sport_type`、`keep_data_type`、`timezone`、`max_heartrate`、`calories`、`raw_path`、`synced_at`。未知或 Keep 未提供的数据保持 `null`，不猜测。
+
+GPX 继续写入 `data/GPX_OUT/`，室外轨迹保持 GCJ-02 → WGS84 转换逻辑。
+
+## Intelligence Layer
+
+运行：
 
 ```bash
-cat data/agent_summary.json
+python3 build_intelligence.py
 ```
 
-### 查看动感单车月度趋势
+输出包括：
 
-```bash
-jq '.primary_activity.by_month' data/agent_summary.json
-```
+- `agent_context.json`：小型、面向 AI 的当前状态与 drill-down 路由；
+- `metrics/monthly.json`：月度全部运动与动感单车统计；
+- `metrics/yearly.json`：年度统计；
+- `normalized/activities.jsonl`：紧凑逐次时间序列。
 
-### 查看最近动感单车
+个人 baseline 使用“有运动的月份”的历史中位数，仅作为**描述性个人基线**，不是医学目标。系统只持久化事实与确定性统计；“为什么中断”“是不是懒”“工作导致运动减少”等因果解释属于后续分析假设。
 
-```bash
-jq '.primary_activity.recent_sessions' data/agent_summary.json
-```
-
-### 需要完整明细时
-
-```bash
-jq '.[] | select(.type == "VirtualRide")' data/data.json
-```
-
-## 生成摘要
-
-```bash
-python3 generate_summary.py
-```
-
-脚本兼容当前数据中两种运动时长表示：数值秒数，以及历史数据里的 `1970-01-01 HH:MM:SS` 格式。
-
-## 配置
-
-在 GitHub Secrets 中设置：
-
-- `KEEP_MOBILE` — Keep 登录手机号
-- `KEEP_PASSWORD` — Keep 登录密码
+旧的 `agent_summary.json` 暂时继续生成，作为兼容层；新 Agent 应优先使用 `agent_context.json`。
 
 ## 自动同步
 
-GitHub Actions 每天自动从 Keep 拉取数据，然后运行 `generate_summary.py` 刷新 `data/agent_summary.json`，最后把数据变化提交回仓库。
+GitHub Actions 每天北京时间 **22:17** 自动运行：同步 Keep → 保存 raw → 更新标准化数据 → 构建 intelligence → 校验 JSON → 有变化才 commit/push。避开整点也能减少 scheduled workflow 高峰期延迟风险。
 
-手动触发：Settings → Actions → Sync Keep Data → Run workflow
+手动运行 Actions 时可选择 `refresh_raw=true` 做一次完整历史 raw backfill。日常定时任务只抓新增记录。
 
-> GitHub Actions 的 cron 使用 UTC；当前 `0 22 * * *` 对应北京时间次日 06:00。
+GitHub Actions 现在支持为 schedule 指定 IANA timezone，本仓库显式使用 `Asia/Shanghai`，避免再靠 UTC 心算。
 
-## 当前历史数据
+## Secrets
 
-当前仓库已有约 220 条运动记录（2018–2026），其中绝大多数为 `VirtualRide`（动感单车 / 室内骑行）。精确统计以后以自动生成的 `data/agent_summary.json` 为准，README 不再手工维护具体计数，避免数据更新后文档过期。
+只在 GitHub Actions Secrets 保存：
+
+- `KEEP_MOBILE`
+- `KEEP_PASSWORD`
+
+凭据不写入仓库、不写入 raw、不写入日志。同步脚本日志只输出数据类型和数量。
+
+## 本地运行
+
+```bash
+export KEEP_MOBILE='...'
+export KEEP_PASSWORD='...'
+python3 sync_keep.py
+python3 build_intelligence.py
+```
+
+首次建立完整历史 raw archive：
+
+```bash
+python3 sync_keep.py --refresh-raw
+python3 build_intelligence.py
+```
+
+## 设计边界
+
+这个项目不负责自动做医疗诊断，也不把一次算法统计包装成健康结论。它负责提供可靠的个人运动事实层与可审计时间序列。未来 Apple Health、体重、睡眠、静息心率等数据源应通过新的 Adapter 接入统一模型，而不是把 Keep-specific 结构继续扩散到整个系统。
