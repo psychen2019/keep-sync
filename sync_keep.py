@@ -5,11 +5,13 @@ import argparse
 import base64
 import json
 import os
+import re
 import sqlite3
 import time
 import zlib
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
 import eviltransform
@@ -109,6 +111,19 @@ def login(session, mobile, password):
     return headers
 
 
+def extract_keep_id(value):
+    """Extract the stable numeric activity id from Keep's heterogeneous IDs."""
+    text = str(value or "").strip()
+    if text.isdigit():
+        return text
+    numeric_parts = re.findall(r"\d+", text)
+    if numeric_parts:
+        candidate = max(numeric_parts, key=len)
+        if len(candidate) >= 6:
+            return candidate
+    raise ValueError(f"cannot extract numeric Keep activity id from {text!r}")
+
+
 def get_all_run_ids(session, headers, sport_type):
     last_date, result, seen_pages = 0, [], set()
     while True:
@@ -140,8 +155,14 @@ def decode_data(text, is_geo=False):
 
 def local_datetime(start_ms, tz_value):
     utc_dt = datetime.fromtimestamp(start_ms / 1000, tz=timezone.utc)
+    tz_text = str(tz_value or "").strip()
+    if tz_text:
+        try:
+            return utc_dt, utc_dt.astimezone(ZoneInfo(tz_text))
+        except Exception:
+            pass
     try:
-        offset = int(tz_value) if str(tz_value).lstrip("-").isdigit() else 0
+        offset = int(tz_text) if tz_text.lstrip("-").isdigit() else 0
     except (TypeError, ValueError):
         offset = 0
     return utc_dt, utc_dt + timedelta(hours=offset)
@@ -186,12 +207,13 @@ def create_gpx(points, start_time, sport_type):
     return gpx
 
 
-def parse_run(session, headers, run_id, sport_type, refresh_raw=False):
+def parse_run(session, headers, run_id, sport_type):
     response = session.get(RUN_LOG_API.format(sport_type=sport_type, run_id=run_id), headers=headers, timeout=30)
     response.raise_for_status()
     envelope = response.json()
     run_data = envelope["data"]
-    keep_id = str(run_data["id"]).split("_")[-1]
+    keep_log_id = str(run_data.get("id") or run_id)
+    keep_id = extract_keep_id(keep_log_id)
     raw_path = save_raw(sport_type, keep_id, envelope)
 
     start_time = run_data.get("startTime") or 0
@@ -213,14 +235,13 @@ def parse_run(session, headers, run_id, sport_type, refresh_raw=False):
 
     distance = float(run_data.get("distance") or 0)
     duration = float(run_data.get("duration") or 0)
-    heart = run_data.get("heartRate") or {}
     avg_hr = first_number(run_data, [("heartRate", "averageHeartRate"), ("averageHeartRate",)])
     max_hr = first_number(run_data, [("heartRate", "maxHeartRate"), ("maxHeartRate",)])
     calories = first_number(run_data, [("calories",), ("calorie",), ("kilocalorie",), ("stats", "calories")])
     utc_dt, local_dt = local_datetime(start_time, run_data.get("timezone", ""))
 
     return {
-        "run_id": int(keep_id), "keep_log_id": str(run_data.get("id", run_id)),
+        "run_id": int(keep_id), "keep_log_id": keep_log_id,
         "keep_sport_type": sport_type, "keep_data_type": data_type,
         "name": f"{activity_type} from keep", "distance": distance,
         "moving_time": duration, "elapsed_time": duration, "type": activity_type, "subtype": activity_type,
@@ -254,11 +275,22 @@ def run_sync(mobile, password, refresh_raw=False):
     changed = 0
     for sport_type in KEEP_SPORT_TYPES:
         ids = get_all_run_ids(session, headers, sport_type)
-        targets = ids if refresh_raw else [rid for rid in ids if str(rid).split("_")[-1] not in existing]
+        if refresh_raw:
+            targets = ids
+        else:
+            targets = []
+            for rid in ids:
+                try:
+                    stable_id = extract_keep_id(rid)
+                except ValueError as exc:
+                    print(f"WARN {sport_type}/{rid}: {exc}")
+                    continue
+                if stable_id not in existing:
+                    targets.append(rid)
         print(f"{sport_type}: {len(ids)} total, {len(targets)} to fetch")
         for rid in targets:
             try:
-                data = parse_run(session, headers, rid, sport_type, refresh_raw)
+                data = parse_run(session, headers, rid, sport_type)
                 upsert(conn, data); existing.add(str(data["run_id"])); changed += 1
             except Exception as exc:
                 print(f"WARN {sport_type}/{rid}: {exc}")
