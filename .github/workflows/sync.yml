@@ -1,9 +1,9 @@
 name: Sync Keep Data
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
   schedule:
-    - cron: '0 22 * * *'  # 每天 22:00 自动同步
+    - cron: '0 22 * * *'
 
 jobs:
   sync:
@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      KEEP_MOBILE: ${{ secrets.KEEP_MOBILE }}
-      KEEP_PASSWORD: ${{ secrets.KEEP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,6 +27,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Sync Keep data
+        env:
+          KEEP_MOBILE: ${{ secrets.KEEP_MOBILE }}
+          KEEP_PASSWORD: ${{ secrets.KEEP_PASSWORD }}
         run: python3 sync_keep.py
 
       - name: Commit and push
