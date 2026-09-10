@@ -4,6 +4,26 @@
 
 核心原则：**源数据尽量无损保存；标准化与分析可重复生成；Agent 分层读取；事实与解释分离。** Keep 只是当前 Adapter，不是最终的数据模型。
 
+## Live Dashboard
+
+仓库现在包含一个面向人的实时仪表盘：`docs/index.html`。
+
+它只读取公开展示所需的三个安全摘要层：
+
+- `data/agent_context.json`
+- `data/metrics/monthly.json`
+- `data/metrics/yearly.json`
+
+页面不会读取 `raw/`、GPX、polyline 或精确位置。Dashboard 每次打开都会从仓库读取最新摘要，因此 Keep 日常同步完成后无需重新生成 HTML。
+
+正式 GitHub Pages 地址设计为：
+
+```text
+https://psychen2019.github.io/keep-sync/
+```
+
+`.github/workflows/pages.yml` 负责把 `docs/` 发布到 GitHub Pages。首次使用时如果仓库尚未启用 Pages，请在仓库 `Settings → Pages → Build and deployment → Source` 选择 **GitHub Actions**，然后手动运行一次 `Deploy Activity Dashboard`，之后数据更新会自动触发页面重新部署。
+
 ## 数据流水线
 
 ```text
