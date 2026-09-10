@@ -1,0 +1,406 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-09-10T04:39:47+00:00",
+  "purpose": "Compact factual context for AI. Prefer this before raw/session data.",
+  "semantics": {
+    "primary_activity": {
+      "type": "VirtualRide",
+      "label": "动感单车 / 室内骑行",
+      "keep_data_type": "indoorCycling"
+    },
+    "epistemic_rule": "facts and descriptive statistics only; causal explanations are hypotheses, not stored facts"
+  },
+  "current_state": {
+    "latest_activity": {
+      "id": 9223370250747297807,
+      "date": "2026-08-07 20:32:20",
+      "type": "Walk",
+      "keep_data_type": null,
+      "minutes": 25.6,
+      "avg_hr": 118.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 2.08
+    },
+    "days_since_any_activity": 34,
+    "latest_primary_activity": {
+      "id": 9223370255325028807,
+      "date": "2026-06-15 20:51:49",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 30.6,
+      "avg_hr": 137.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    "days_since_primary_activity": 87
+  },
+  "windows": {
+    "7": {
+      "all": {
+        "sessions": 0,
+        "total_minutes": 0,
+        "median_session_minutes": null,
+        "avg_hr": null
+      },
+      "primary": {
+        "sessions": 0,
+        "total_minutes": 0,
+        "median_session_minutes": null,
+        "avg_hr": null
+      }
+    },
+    "30": {
+      "all": {
+        "sessions": 0,
+        "total_minutes": 0,
+        "median_session_minutes": null,
+        "avg_hr": null
+      },
+      "primary": {
+        "sessions": 0,
+        "total_minutes": 0,
+        "median_session_minutes": null,
+        "avg_hr": null
+      }
+    },
+    "90": {
+      "all": {
+        "sessions": 2,
+        "total_minutes": 56.3,
+        "median_session_minutes": 28.1,
+        "avg_hr": 127.5,
+        "hr_coverage_percent": 100.0
+      },
+      "primary": {
+        "sessions": 1,
+        "total_minutes": 30.6,
+        "median_session_minutes": 30.6,
+        "avg_hr": 137.0,
+        "hr_coverage_percent": 100.0
+      }
+    },
+    "365": {
+      "all": {
+        "sessions": 41,
+        "total_minutes": 1146.9,
+        "median_session_minutes": 30.6,
+        "avg_hr": 122.6,
+        "hr_coverage_percent": 70.7
+      },
+      "primary": {
+        "sessions": 39,
+        "total_minutes": 1075.7,
+        "median_session_minutes": 30.6,
+        "avg_hr": 123.3,
+        "hr_coverage_percent": 69.2
+      }
+    }
+  },
+  "all_time": {
+    "all": {
+      "sessions": 220,
+      "total_minutes": 3722.0,
+      "median_session_minutes": 8.7,
+      "avg_hr": 125.1,
+      "hr_coverage_percent": 59.1
+    },
+    "primary": {
+      "sessions": 179,
+      "total_minutes": 2295.9,
+      "median_session_minutes": 5.8,
+      "avg_hr": 120.0,
+      "hr_coverage_percent": 50.8
+    },
+    "types": {
+      "Walk": 6,
+      "VirtualRide": 179,
+      "Hiking": 1,
+      "Run": 34
+    },
+    "first_activity_date": "2018-07-31",
+    "longest_gap_days": 1506,
+    "primary_longest_gap_days": 1513,
+    "primary_active_weeks_last_12": 4
+  },
+  "personal_baseline": {
+    "active_month_median_sessions": 5.0,
+    "active_month_median_minutes": 70.7,
+    "note": "Personal descriptive baseline from months with at least one primary-activity session; not a medical target."
+  },
+  "recent_primary_sessions": [
+    {
+      "id": 9223370255325028807,
+      "date": "2026-06-15 20:51:49",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 30.6,
+      "avg_hr": 137.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370256967386807,
+      "date": "2026-05-27 20:39:35",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 30.2,
+      "avg_hr": 128.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370257678766807,
+      "date": "2026-05-19 15:27:56",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 5.5,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370257915553807,
+      "date": "2026-05-16 21:05:11",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 41.9,
+      "avg_hr": 117.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370258003690807,
+      "date": "2026-05-15 21:12:37",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 5.5,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370258004109807,
+      "date": "2026-05-15 20:27:47",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 43.3,
+      "avg_hr": 115.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370265091492807,
+      "date": "2026-02-22 19:43:56",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 44.1,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370266475131807,
+      "date": "2026-02-06 19:39:56",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 27.5,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370267508051807,
+      "date": "2026-01-25 20:32:00",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 40.1,
+      "avg_hr": 127.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370267765818807,
+      "date": "2026-01-22 20:55:26",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 40.5,
+      "avg_hr": 117.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370267854082807,
+      "date": "2026-01-21 20:14:22",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 50.5,
+      "avg_hr": 117.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370268978807807,
+      "date": "2026-01-08 20:19:50",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 19.6,
+      "avg_hr": 123.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    }
+  ],
+  "recent_sessions": [
+    {
+      "id": 9223370250747297807,
+      "date": "2026-08-07 20:32:20",
+      "type": "Walk",
+      "keep_data_type": null,
+      "minutes": 25.6,
+      "avg_hr": 118.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 2.08
+    },
+    {
+      "id": 9223370255325028807,
+      "date": "2026-06-15 20:51:49",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 30.6,
+      "avg_hr": 137.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370256967386807,
+      "date": "2026-05-27 20:39:35",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 30.2,
+      "avg_hr": 128.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370257317490807,
+      "date": "2026-05-23 19:09:08",
+      "type": "Walk",
+      "keep_data_type": null,
+      "minutes": 45.6,
+      "avg_hr": 109.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 2.85
+    },
+    {
+      "id": 9223370257678766807,
+      "date": "2026-05-19 15:27:56",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 5.5,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370257915553807,
+      "date": "2026-05-16 21:05:11",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 41.9,
+      "avg_hr": 117.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370258003690807,
+      "date": "2026-05-15 21:12:37",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 5.5,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370258004109807,
+      "date": "2026-05-15 20:27:47",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 43.3,
+      "avg_hr": 115.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370265091492807,
+      "date": "2026-02-22 19:43:56",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 44.1,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370266475131807,
+      "date": "2026-02-06 19:39:56",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 27.5,
+      "avg_hr": null,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370267508051807,
+      "date": "2026-01-25 20:32:00",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 40.1,
+      "avg_hr": 127.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    },
+    {
+      "id": 9223370267765818807,
+      "date": "2026-01-22 20:55:26",
+      "type": "VirtualRide",
+      "keep_data_type": null,
+      "minutes": 40.5,
+      "avg_hr": 117.0,
+      "max_hr": null,
+      "calories": null,
+      "distance_km": 0.0
+    }
+  ],
+  "drill_down": {
+    "monthly": "data/metrics/monthly.json",
+    "yearly": "data/metrics/yearly.json",
+    "normalized": "data/normalized/activities.jsonl",
+    "raw": "data/raw/<sport_type>/<id>.json"
+  }
+}

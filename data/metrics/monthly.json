@@ -1,0 +1,369 @@
+{
+  "2018-07": {
+    "all": {
+      "sessions": 1,
+      "total_minutes": 2.1,
+      "median_session_minutes": 2.1,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    },
+    "primary": {
+      "sessions": 1,
+      "total_minutes": 2.1,
+      "median_session_minutes": 2.1,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    }
+  },
+  "2022-09": {
+    "all": {
+      "sessions": 14,
+      "total_minutes": 287.8,
+      "median_session_minutes": 28.6,
+      "avg_hr": 133.9,
+      "hr_coverage_percent": 71.4
+    },
+    "primary": {
+      "sessions": 6,
+      "total_minutes": 28.9,
+      "median_session_minutes": 5.6,
+      "avg_hr": 107.0,
+      "hr_coverage_percent": 33.3
+    }
+  },
+  "2022-10": {
+    "all": {
+      "sessions": 21,
+      "total_minutes": 499.8,
+      "median_session_minutes": 24.4,
+      "avg_hr": 129.2,
+      "hr_coverage_percent": 71.4
+    },
+    "primary": {
+      "sessions": 9,
+      "total_minutes": 51.0,
+      "median_session_minutes": 5.7,
+      "avg_hr": 101.0,
+      "hr_coverage_percent": 44.4
+    }
+  },
+  "2022-11": {
+    "all": {
+      "sessions": 14,
+      "total_minutes": 273.6,
+      "median_session_minutes": 10.8,
+      "avg_hr": 127.2,
+      "hr_coverage_percent": 64.3
+    },
+    "primary": {
+      "sessions": 6,
+      "total_minutes": 33.9,
+      "median_session_minutes": 5.7,
+      "avg_hr": 101.5,
+      "hr_coverage_percent": 33.3
+    }
+  },
+  "2023-03": {
+    "all": {
+      "sessions": 11,
+      "total_minutes": 176.4,
+      "median_session_minutes": 14.3,
+      "avg_hr": 130.1,
+      "hr_coverage_percent": 100.0
+    },
+    "primary": {
+      "sessions": 4,
+      "total_minutes": 23.0,
+      "median_session_minutes": 5.8,
+      "avg_hr": 111.2,
+      "hr_coverage_percent": 100.0
+    }
+  },
+  "2023-08": {
+    "all": {
+      "sessions": 1,
+      "total_minutes": 1.0,
+      "median_session_minutes": 1.0,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    },
+    "primary": {
+      "sessions": 1,
+      "total_minutes": 1.0,
+      "median_session_minutes": 1.0,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    }
+  },
+  "2023-12": {
+    "all": {
+      "sessions": 2,
+      "total_minutes": 35.5,
+      "median_session_minutes": 17.7,
+      "avg_hr": 138.5,
+      "hr_coverage_percent": 100.0
+    },
+    "primary": {
+      "sessions": 1,
+      "total_minutes": 5.7,
+      "median_session_minutes": 5.7,
+      "avg_hr": 114.0,
+      "hr_coverage_percent": 100.0
+    }
+  },
+  "2024-12": {
+    "all": {
+      "sessions": 45,
+      "total_minutes": 551.4,
+      "median_session_minutes": 8.7,
+      "avg_hr": 122.5,
+      "hr_coverage_percent": 73.3
+    },
+    "primary": {
+      "sessions": 43,
+      "total_minutes": 470.1,
+      "median_session_minutes": 8.7,
+      "avg_hr": 122.5,
+      "hr_coverage_percent": 72.1
+    }
+  },
+  "2025-01": {
+    "all": {
+      "sessions": 29,
+      "total_minutes": 106.1,
+      "median_session_minutes": 1.4,
+      "avg_hr": 123.0,
+      "hr_coverage_percent": 6.9
+    },
+    "primary": {
+      "sessions": 29,
+      "total_minutes": 106.1,
+      "median_session_minutes": 1.4,
+      "avg_hr": 123.0,
+      "hr_coverage_percent": 6.9
+    }
+  },
+  "2025-02": {
+    "all": {
+      "sessions": 17,
+      "total_minutes": 178.5,
+      "median_session_minutes": 3.3,
+      "avg_hr": 120.6,
+      "hr_coverage_percent": 58.8
+    },
+    "primary": {
+      "sessions": 17,
+      "total_minutes": 178.5,
+      "median_session_minutes": 3.3,
+      "avg_hr": 120.6,
+      "hr_coverage_percent": 58.8
+    }
+  },
+  "2025-03": {
+    "all": {
+      "sessions": 5,
+      "total_minutes": 96.4,
+      "median_session_minutes": 23.1,
+      "avg_hr": 117.8,
+      "hr_coverage_percent": 80.0
+    },
+    "primary": {
+      "sessions": 5,
+      "total_minutes": 96.4,
+      "median_session_minutes": 23.1,
+      "avg_hr": 117.8,
+      "hr_coverage_percent": 80.0
+    }
+  },
+  "2025-04": {
+    "all": {
+      "sessions": 6,
+      "total_minutes": 269.2,
+      "median_session_minutes": 35.6,
+      "avg_hr": 121.2,
+      "hr_coverage_percent": 66.7
+    },
+    "primary": {
+      "sessions": 5,
+      "total_minutes": 126.1,
+      "median_session_minutes": 25.3,
+      "avg_hr": 122.3,
+      "hr_coverage_percent": 60.0
+    }
+  },
+  "2025-05": {
+    "all": {
+      "sessions": 10,
+      "total_minutes": 81.8,
+      "median_session_minutes": 3.2,
+      "avg_hr": 127.0,
+      "hr_coverage_percent": 10.0
+    },
+    "primary": {
+      "sessions": 10,
+      "total_minutes": 81.8,
+      "median_session_minutes": 3.2,
+      "avg_hr": 127.0,
+      "hr_coverage_percent": 10.0
+    }
+  },
+  "2025-06": {
+    "all": {
+      "sessions": 1,
+      "total_minutes": 2.4,
+      "median_session_minutes": 2.4,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    },
+    "primary": {
+      "sessions": 1,
+      "total_minutes": 2.4,
+      "median_session_minutes": 2.4,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    }
+  },
+  "2025-09": {
+    "all": {
+      "sessions": 9,
+      "total_minutes": 93.7,
+      "median_session_minutes": 6.4,
+      "avg_hr": 130.5,
+      "hr_coverage_percent": 22.2
+    },
+    "primary": {
+      "sessions": 9,
+      "total_minutes": 93.7,
+      "median_session_minutes": 6.4,
+      "avg_hr": 130.5,
+      "hr_coverage_percent": 22.2
+    }
+  },
+  "2025-10": {
+    "all": {
+      "sessions": 4,
+      "total_minutes": 67.9,
+      "median_session_minutes": 17.9,
+      "avg_hr": 120.7,
+      "hr_coverage_percent": 75.0
+    },
+    "primary": {
+      "sessions": 4,
+      "total_minutes": 67.9,
+      "median_session_minutes": 17.9,
+      "avg_hr": 120.7,
+      "hr_coverage_percent": 75.0
+    }
+  },
+  "2025-11": {
+    "all": {
+      "sessions": 3,
+      "total_minutes": 69.7,
+      "median_session_minutes": 25.8,
+      "avg_hr": 122.5,
+      "hr_coverage_percent": 66.7
+    },
+    "primary": {
+      "sessions": 3,
+      "total_minutes": 69.7,
+      "median_session_minutes": 25.8,
+      "avg_hr": 122.5,
+      "hr_coverage_percent": 66.7
+    }
+  },
+  "2025-12": {
+    "all": {
+      "sessions": 10,
+      "total_minutes": 356.8,
+      "median_session_minutes": 37.8,
+      "avg_hr": 123.1,
+      "hr_coverage_percent": 90.0
+    },
+    "primary": {
+      "sessions": 10,
+      "total_minutes": 356.8,
+      "median_session_minutes": 37.8,
+      "avg_hr": 123.1,
+      "hr_coverage_percent": 90.0
+    }
+  },
+  "2026-01": {
+    "all": {
+      "sessions": 7,
+      "total_minutes": 272.1,
+      "median_session_minutes": 40.5,
+      "avg_hr": 122.3,
+      "hr_coverage_percent": 100.0
+    },
+    "primary": {
+      "sessions": 7,
+      "total_minutes": 272.1,
+      "median_session_minutes": 40.5,
+      "avg_hr": 122.3,
+      "hr_coverage_percent": 100.0
+    }
+  },
+  "2026-02": {
+    "all": {
+      "sessions": 2,
+      "total_minutes": 71.6,
+      "median_session_minutes": 35.8,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    },
+    "primary": {
+      "sessions": 2,
+      "total_minutes": 71.6,
+      "median_session_minutes": 35.8,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    }
+  },
+  "2026-05": {
+    "all": {
+      "sessions": 6,
+      "total_minutes": 172.0,
+      "median_session_minutes": 36.0,
+      "avg_hr": 117.2,
+      "hr_coverage_percent": 66.7
+    },
+    "primary": {
+      "sessions": 5,
+      "total_minutes": 126.4,
+      "median_session_minutes": 30.2,
+      "avg_hr": 120.0,
+      "hr_coverage_percent": 60.0
+    }
+  },
+  "2026-06": {
+    "all": {
+      "sessions": 1,
+      "total_minutes": 30.6,
+      "median_session_minutes": 30.6,
+      "avg_hr": 137.0,
+      "hr_coverage_percent": 100.0
+    },
+    "primary": {
+      "sessions": 1,
+      "total_minutes": 30.6,
+      "median_session_minutes": 30.6,
+      "avg_hr": 137.0,
+      "hr_coverage_percent": 100.0
+    }
+  },
+  "2026-08": {
+    "all": {
+      "sessions": 1,
+      "total_minutes": 25.6,
+      "median_session_minutes": 25.6,
+      "avg_hr": 118.0,
+      "hr_coverage_percent": 100.0
+    },
+    "primary": {
+      "sessions": 0,
+      "total_minutes": 0,
+      "median_session_minutes": null,
+      "avg_hr": null
+    }
+  }
+}

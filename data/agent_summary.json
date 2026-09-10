@@ -1,0 +1,516 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-10T04:39:47+00:00",
+  "source": "data/data.json",
+  "agent_note": "Prefer this compact file for trend questions. Read data/data.json only when session-level detail beyond recent_activity is required.",
+  "overall": {
+    "sessions": 220,
+    "first_activity_date": "2018-07-31",
+    "latest_activity_date": "2026-08-07",
+    "types": {
+      "VirtualRide": 179,
+      "Run": 34,
+      "Walk": 6,
+      "Hiking": 1
+    }
+  },
+  "primary_activity": {
+    "type": "VirtualRide",
+    "label": "动感单车 / 室内骑行",
+    "sessions": 179,
+    "share_of_all_sessions_percent": 81.4,
+    "first_date": "2018-07-31",
+    "latest_date": "2026-06-15",
+    "all_time": {
+      "sessions": 179,
+      "total_minutes": 2295.9,
+      "average_minutes_per_session": 12.8,
+      "average_heart_rate": 120.0,
+      "heart_rate_samples": 91
+    },
+    "by_year": {
+      "2018": {
+        "sessions": 1,
+        "total_minutes": 2.1,
+        "average_minutes_per_session": 2.1,
+        "average_heart_rate": null,
+        "heart_rate_samples": 0
+      },
+      "2022": {
+        "sessions": 21,
+        "total_minutes": 113.8,
+        "average_minutes_per_session": 5.4,
+        "average_heart_rate": 102.6,
+        "heart_rate_samples": 8
+      },
+      "2023": {
+        "sessions": 6,
+        "total_minutes": 29.7,
+        "average_minutes_per_session": 4.9,
+        "average_heart_rate": 111.8,
+        "heart_rate_samples": 5
+      },
+      "2024": {
+        "sessions": 43,
+        "total_minutes": 470.1,
+        "average_minutes_per_session": 10.9,
+        "average_heart_rate": 122.5,
+        "heart_rate_samples": 31
+      },
+      "2025": {
+        "sessions": 93,
+        "total_minutes": 1179.5,
+        "average_minutes_per_session": 12.7,
+        "average_heart_rate": 122.0,
+        "heart_rate_samples": 36
+      },
+      "2026": {
+        "sessions": 15,
+        "total_minutes": 500.7,
+        "average_minutes_per_session": 33.4,
+        "average_heart_rate": 123.0,
+        "heart_rate_samples": 11
+      }
+    },
+    "by_month": {
+      "2018-07": {
+        "sessions": 1,
+        "total_minutes": 2.1,
+        "average_minutes_per_session": 2.1,
+        "average_heart_rate": null,
+        "heart_rate_samples": 0
+      },
+      "2022-09": {
+        "sessions": 6,
+        "total_minutes": 28.9,
+        "average_minutes_per_session": 4.8,
+        "average_heart_rate": 107.0,
+        "heart_rate_samples": 2
+      },
+      "2022-10": {
+        "sessions": 9,
+        "total_minutes": 51.0,
+        "average_minutes_per_session": 5.7,
+        "average_heart_rate": 101.0,
+        "heart_rate_samples": 4
+      },
+      "2022-11": {
+        "sessions": 6,
+        "total_minutes": 33.9,
+        "average_minutes_per_session": 5.6,
+        "average_heart_rate": 101.5,
+        "heart_rate_samples": 2
+      },
+      "2023-03": {
+        "sessions": 4,
+        "total_minutes": 23.0,
+        "average_minutes_per_session": 5.8,
+        "average_heart_rate": 111.2,
+        "heart_rate_samples": 4
+      },
+      "2023-08": {
+        "sessions": 1,
+        "total_minutes": 1.0,
+        "average_minutes_per_session": 1.0,
+        "average_heart_rate": null,
+        "heart_rate_samples": 0
+      },
+      "2023-12": {
+        "sessions": 1,
+        "total_minutes": 5.7,
+        "average_minutes_per_session": 5.7,
+        "average_heart_rate": 114.0,
+        "heart_rate_samples": 1
+      },
+      "2024-12": {
+        "sessions": 43,
+        "total_minutes": 470.1,
+        "average_minutes_per_session": 10.9,
+        "average_heart_rate": 122.5,
+        "heart_rate_samples": 31
+      },
+      "2025-01": {
+        "sessions": 29,
+        "total_minutes": 106.1,
+        "average_minutes_per_session": 3.7,
+        "average_heart_rate": 123.0,
+        "heart_rate_samples": 2
+      },
+      "2025-02": {
+        "sessions": 17,
+        "total_minutes": 178.5,
+        "average_minutes_per_session": 10.5,
+        "average_heart_rate": 120.6,
+        "heart_rate_samples": 10
+      },
+      "2025-03": {
+        "sessions": 5,
+        "total_minutes": 96.4,
+        "average_minutes_per_session": 19.3,
+        "average_heart_rate": 117.8,
+        "heart_rate_samples": 4
+      },
+      "2025-04": {
+        "sessions": 5,
+        "total_minutes": 126.1,
+        "average_minutes_per_session": 25.2,
+        "average_heart_rate": 122.3,
+        "heart_rate_samples": 3
+      },
+      "2025-05": {
+        "sessions": 10,
+        "total_minutes": 81.8,
+        "average_minutes_per_session": 8.2,
+        "average_heart_rate": 127.0,
+        "heart_rate_samples": 1
+      },
+      "2025-06": {
+        "sessions": 1,
+        "total_minutes": 2.4,
+        "average_minutes_per_session": 2.4,
+        "average_heart_rate": null,
+        "heart_rate_samples": 0
+      },
+      "2025-09": {
+        "sessions": 9,
+        "total_minutes": 93.7,
+        "average_minutes_per_session": 10.4,
+        "average_heart_rate": 130.5,
+        "heart_rate_samples": 2
+      },
+      "2025-10": {
+        "sessions": 4,
+        "total_minutes": 67.9,
+        "average_minutes_per_session": 17.0,
+        "average_heart_rate": 120.7,
+        "heart_rate_samples": 3
+      },
+      "2025-11": {
+        "sessions": 3,
+        "total_minutes": 69.7,
+        "average_minutes_per_session": 23.2,
+        "average_heart_rate": 122.5,
+        "heart_rate_samples": 2
+      },
+      "2025-12": {
+        "sessions": 10,
+        "total_minutes": 356.8,
+        "average_minutes_per_session": 35.7,
+        "average_heart_rate": 123.1,
+        "heart_rate_samples": 9
+      },
+      "2026-01": {
+        "sessions": 7,
+        "total_minutes": 272.1,
+        "average_minutes_per_session": 38.9,
+        "average_heart_rate": 122.3,
+        "heart_rate_samples": 7
+      },
+      "2026-02": {
+        "sessions": 2,
+        "total_minutes": 71.6,
+        "average_minutes_per_session": 35.8,
+        "average_heart_rate": null,
+        "heart_rate_samples": 0
+      },
+      "2026-05": {
+        "sessions": 5,
+        "total_minutes": 126.4,
+        "average_minutes_per_session": 25.3,
+        "average_heart_rate": 120.0,
+        "heart_rate_samples": 3
+      },
+      "2026-06": {
+        "sessions": 1,
+        "total_minutes": 30.6,
+        "average_minutes_per_session": 30.6,
+        "average_heart_rate": 137.0,
+        "heart_rate_samples": 1
+      }
+    },
+    "recent_sessions": [
+      {
+        "date": "2026-06-15 20:51:49",
+        "type": "VirtualRide",
+        "duration_minutes": 30.6,
+        "average_heart_rate": 137.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-05-27 20:39:35",
+        "type": "VirtualRide",
+        "duration_minutes": 30.2,
+        "average_heart_rate": 128.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-05-19 15:27:56",
+        "type": "VirtualRide",
+        "duration_minutes": 5.5,
+        "average_heart_rate": null,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-05-16 21:05:11",
+        "type": "VirtualRide",
+        "duration_minutes": 41.9,
+        "average_heart_rate": 117.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-05-15 21:12:37",
+        "type": "VirtualRide",
+        "duration_minutes": 5.5,
+        "average_heart_rate": null,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-05-15 20:27:47",
+        "type": "VirtualRide",
+        "duration_minutes": 43.3,
+        "average_heart_rate": 115.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-02-22 19:43:56",
+        "type": "VirtualRide",
+        "duration_minutes": 44.1,
+        "average_heart_rate": null,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-02-06 19:39:56",
+        "type": "VirtualRide",
+        "duration_minutes": 27.5,
+        "average_heart_rate": null,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-25 20:32:00",
+        "type": "VirtualRide",
+        "duration_minutes": 40.1,
+        "average_heart_rate": 127.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-22 20:55:26",
+        "type": "VirtualRide",
+        "duration_minutes": 40.5,
+        "average_heart_rate": 117.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-21 20:14:22",
+        "type": "VirtualRide",
+        "duration_minutes": 50.5,
+        "average_heart_rate": 117.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-08 20:19:50",
+        "type": "VirtualRide",
+        "duration_minutes": 19.6,
+        "average_heart_rate": 123.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-07 20:44:02",
+        "type": "VirtualRide",
+        "duration_minutes": 41.0,
+        "average_heart_rate": 126.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-06 20:47:44",
+        "type": "VirtualRide",
+        "duration_minutes": 41.6,
+        "average_heart_rate": 123.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2026-01-02 21:16:37",
+        "type": "VirtualRide",
+        "duration_minutes": 38.7,
+        "average_heart_rate": 123.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2025-12-18 20:16:22",
+        "type": "VirtualRide",
+        "duration_minutes": 48.1,
+        "average_heart_rate": 127.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2025-12-17 21:10:31",
+        "type": "VirtualRide",
+        "duration_minutes": 31.0,
+        "average_heart_rate": 125.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2025-12-15 22:05:32",
+        "type": "VirtualRide",
+        "duration_minutes": 40.1,
+        "average_heart_rate": 122.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2025-12-14 20:14:19",
+        "type": "VirtualRide",
+        "duration_minutes": 32.8,
+        "average_heart_rate": 121.0,
+        "distance_km": 0.0
+      },
+      {
+        "date": "2025-12-13 20:38:11",
+        "type": "VirtualRide",
+        "duration_minutes": 49.3,
+        "average_heart_rate": 121.0,
+        "distance_km": 0.0
+      }
+    ]
+  },
+  "recent_activity": [
+    {
+      "date": "2026-08-07 20:32:20",
+      "type": "Walk",
+      "duration_minutes": 25.6,
+      "average_heart_rate": 118.0,
+      "distance_km": 2.08
+    },
+    {
+      "date": "2026-06-15 20:51:49",
+      "type": "VirtualRide",
+      "duration_minutes": 30.6,
+      "average_heart_rate": 137.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-05-27 20:39:35",
+      "type": "VirtualRide",
+      "duration_minutes": 30.2,
+      "average_heart_rate": 128.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-05-23 19:09:08",
+      "type": "Walk",
+      "duration_minutes": 45.6,
+      "average_heart_rate": 109.0,
+      "distance_km": 2.85
+    },
+    {
+      "date": "2026-05-19 15:27:56",
+      "type": "VirtualRide",
+      "duration_minutes": 5.5,
+      "average_heart_rate": null,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-05-16 21:05:11",
+      "type": "VirtualRide",
+      "duration_minutes": 41.9,
+      "average_heart_rate": 117.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-05-15 21:12:37",
+      "type": "VirtualRide",
+      "duration_minutes": 5.5,
+      "average_heart_rate": null,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-05-15 20:27:47",
+      "type": "VirtualRide",
+      "duration_minutes": 43.3,
+      "average_heart_rate": 115.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-02-22 19:43:56",
+      "type": "VirtualRide",
+      "duration_minutes": 44.1,
+      "average_heart_rate": null,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-02-06 19:39:56",
+      "type": "VirtualRide",
+      "duration_minutes": 27.5,
+      "average_heart_rate": null,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-25 20:32:00",
+      "type": "VirtualRide",
+      "duration_minutes": 40.1,
+      "average_heart_rate": 127.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-22 20:55:26",
+      "type": "VirtualRide",
+      "duration_minutes": 40.5,
+      "average_heart_rate": 117.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-21 20:14:22",
+      "type": "VirtualRide",
+      "duration_minutes": 50.5,
+      "average_heart_rate": 117.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-08 20:19:50",
+      "type": "VirtualRide",
+      "duration_minutes": 19.6,
+      "average_heart_rate": 123.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-07 20:44:02",
+      "type": "VirtualRide",
+      "duration_minutes": 41.0,
+      "average_heart_rate": 126.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-06 20:47:44",
+      "type": "VirtualRide",
+      "duration_minutes": 41.6,
+      "average_heart_rate": 123.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2026-01-02 21:16:37",
+      "type": "VirtualRide",
+      "duration_minutes": 38.7,
+      "average_heart_rate": 123.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2025-12-18 20:16:22",
+      "type": "VirtualRide",
+      "duration_minutes": 48.1,
+      "average_heart_rate": 127.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2025-12-17 21:10:31",
+      "type": "VirtualRide",
+      "duration_minutes": 31.0,
+      "average_heart_rate": 125.0,
+      "distance_km": 0.0
+    },
+    {
+      "date": "2025-12-15 22:05:32",
+      "type": "VirtualRide",
+      "duration_minutes": 40.1,
+      "average_heart_rate": 122.0,
+      "distance_km": 0.0
+    }
+  ]
+}

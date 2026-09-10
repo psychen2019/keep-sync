@@ -1,0 +1,98 @@
+{
+  "2018": {
+    "all": {
+      "sessions": 1,
+      "total_minutes": 2.1,
+      "median_session_minutes": 2.1,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    },
+    "primary": {
+      "sessions": 1,
+      "total_minutes": 2.1,
+      "median_session_minutes": 2.1,
+      "avg_hr": null,
+      "hr_coverage_percent": 0.0
+    }
+  },
+  "2022": {
+    "all": {
+      "sessions": 49,
+      "total_minutes": 1061.1,
+      "median_session_minutes": 24.4,
+      "avg_hr": 130.1,
+      "hr_coverage_percent": 69.4
+    },
+    "primary": {
+      "sessions": 21,
+      "total_minutes": 113.8,
+      "median_session_minutes": 5.7,
+      "avg_hr": 102.6,
+      "hr_coverage_percent": 38.1
+    }
+  },
+  "2023": {
+    "all": {
+      "sessions": 14,
+      "total_minutes": 212.9,
+      "median_session_minutes": 12.1,
+      "avg_hr": 131.4,
+      "hr_coverage_percent": 92.9
+    },
+    "primary": {
+      "sessions": 6,
+      "total_minutes": 29.7,
+      "median_session_minutes": 5.8,
+      "avg_hr": 111.8,
+      "hr_coverage_percent": 83.3
+    }
+  },
+  "2024": {
+    "all": {
+      "sessions": 45,
+      "total_minutes": 551.4,
+      "median_session_minutes": 8.7,
+      "avg_hr": 122.5,
+      "hr_coverage_percent": 73.3
+    },
+    "primary": {
+      "sessions": 43,
+      "total_minutes": 470.1,
+      "median_session_minutes": 8.7,
+      "avg_hr": 122.5,
+      "hr_coverage_percent": 72.1
+    }
+  },
+  "2025": {
+    "all": {
+      "sessions": 94,
+      "total_minutes": 1322.5,
+      "median_session_minutes": 4.7,
+      "avg_hr": 121.9,
+      "hr_coverage_percent": 39.4
+    },
+    "primary": {
+      "sessions": 93,
+      "total_minutes": 1179.5,
+      "median_session_minutes": 4.2,
+      "avg_hr": 122.0,
+      "hr_coverage_percent": 38.7
+    }
+  },
+  "2026": {
+    "all": {
+      "sessions": 17,
+      "total_minutes": 572.0,
+      "median_session_minutes": 40.1,
+      "avg_hr": 121.5,
+      "hr_coverage_percent": 76.5
+    },
+    "primary": {
+      "sessions": 15,
+      "total_minutes": 500.7,
+      "median_session_minutes": 40.1,
+      "avg_hr": 123.0,
+      "hr_coverage_percent": 73.3
+    }
+  }
+}
