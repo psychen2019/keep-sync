@@ -29,6 +29,9 @@ jobs:
       - name: Sync Keep data
         run: python3 sync_keep.py '${{ secrets.KEEP_MOBILE }}' '${{ secrets.KEEP_PASSWORD }}'
 
+      - name: Generate compact agent summary
+        run: python3 generate_summary.py
+
       - name: Commit and push
         run: |
           git config --local user.email "action@github.com"
