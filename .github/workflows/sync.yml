@@ -5,12 +5,14 @@ on:
   schedule:
     - cron: '0 22 * * *'
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   sync:
     name: Keep Sync
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,6 +27,11 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Debug secrets
+        run: |
+          echo "KEEP_MOBILE length: ${#KEEP_MOBILE}"
+          echo "KEEP_PASSWORD length: ${#KEEP_PASSWORD}"
 
       - name: Sync Keep data
         env:
