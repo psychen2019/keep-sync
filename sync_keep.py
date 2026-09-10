@@ -307,14 +307,15 @@ def print_summary():
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Keep 运动数据同步")
+    parser.add_argument("mobile", help="Keep 手机号")
+    parser.add_argument("password", help="Keep 密码")
+    args = parser.parse_args()
+    
     ensure_dirs()
     
-    mobile = os.environ.get("KEEP_MOBILE")
-    password = os.environ.get("KEEP_PASSWORD")
-    
-    if not mobile or not password:
-        print("错误: 请设置环境变量 KEEP_MOBILE 和 KEEP_PASSWORD")
-        sys.exit(1)
+    count = run_sync(args.mobile, args.password)
     
     count = run_sync(mobile, password)
     if count > 0:

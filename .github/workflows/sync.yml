@@ -7,11 +7,9 @@ on:
 
 permissions:
   contents: write
-  id-token: write
 
 jobs:
   sync:
-    name: Keep Sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,16 +26,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Debug secrets
-        run: |
-          echo "KEEP_MOBILE length: ${#KEEP_MOBILE}"
-          echo "KEEP_PASSWORD length: ${#KEEP_PASSWORD}"
-
       - name: Sync Keep data
-        env:
-          KEEP_MOBILE: ${{ secrets.KEEP_MOBILE }}
-          KEEP_PASSWORD: ${{ secrets.KEEP_PASSWORD }}
-        run: python3 sync_keep.py
+        run: python3 sync_keep.py '${{ secrets.KEEP_MOBILE }}' '${{ secrets.KEEP_PASSWORD }}'
 
       - name: Commit and push
         run: |
