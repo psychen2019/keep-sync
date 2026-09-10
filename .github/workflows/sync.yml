@@ -1,0 +1,42 @@
+name: Sync Keep Data
+
+on:
+  workflow_dispatch:  # 手动触发
+  schedule:
+    - cron: '0 22 * * *'  # 每天 22:00 自动同步
+
+env:
+  KEEP_MOBILE: ${{ secrets.KEEP_MOBILE }}
+  KEEP_PASSWORD: ${{ secrets.KEEP_PASSWORD }}
+
+jobs:
+  sync:
+    name: Keep Sync
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: 'requirements.txt'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Sync Keep data
+        run: python3 sync_keep.py
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/
+          git diff --cached --quiet || git commit -m "update keep data $(date +%Y-%m-%d)" || echo 'no new data'
+          git push
