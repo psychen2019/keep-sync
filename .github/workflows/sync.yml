@@ -5,16 +5,15 @@ on:
   schedule:
     - cron: '0 22 * * *'  # 每天 22:00 自动同步
 
-env:
-  KEEP_MOBILE: ${{ secrets.KEEP_MOBILE }}
-  KEEP_PASSWORD: ${{ secrets.KEEP_PASSWORD }}
-
 jobs:
   sync:
     name: Keep Sync
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      KEEP_MOBILE: ${{ secrets.KEEP_MOBILE }}
+      KEEP_PASSWORD: ${{ secrets.KEEP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
