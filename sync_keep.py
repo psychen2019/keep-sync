@@ -1,29 +1,15 @@
 #!/usr/bin/env python3
-"""
-Keep 运动数据同步脚本
-从 Keep APP 拉取所有运动数据，存储为 SQLite + JSON
-供 Agent 读取和调用
-
-用法:
-  python3 sync_keep.py                    # 同步全部类型
-  python3 sync_keep.py --dry-run         # 只看新增条数，不写入
-
-环境变量:
-  KEEP_MOBILE     - Keep 登录手机号
-  KEEP_PASSWORD   - Keep 登录密码
-"""
+"""Keep ingestion layer: fetch, preserve raw responses, normalize core fields, export SQLite/JSON."""
 
 import argparse
 import base64
 import json
 import os
 import sqlite3
-import sys
 import time
 import zlib
-from collections import namedtuple
 from datetime import datetime, timedelta, timezone
-from xml.dom import minidom
+from pathlib import Path
 import xml.etree.ElementTree as ET
 
 import eviltransform
@@ -31,15 +17,18 @@ import gpxpy
 import polyline
 import requests
 from Crypto.Cipher import AES
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-# ============ 配置 ============
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-DB_PATH = os.path.join(DATA_DIR, "data.db")
-JSON_PATH = os.path.join(DATA_DIR, "data.json")
-GPX_DIR = os.path.join(DATA_DIR, "GPX_OUT")
+ROOT = Path(__file__).resolve().parent
+DATA_DIR = ROOT / "data"
+DB_PATH = DATA_DIR / "data.db"
+JSON_PATH = DATA_DIR / "data.json"
+RAW_DIR = DATA_DIR / "raw"
+GPX_DIR = DATA_DIR / "GPX_OUT"
 
-KEEP_SPORT_TYPES = ["running", "hiking", "cycling", "training"]
-KEEP2STRAVA = {
+KEEP_SPORT_TYPES = ("running", "hiking", "cycling", "training")
+KEEP2ACTIVITY = {
     "outdoorWalking": "Walk",
     "outdoorRunning": "Run",
     "outdoorCycling": "Ride",
@@ -54,268 +43,242 @@ TRANS_GCJ02_TO_WGS84 = True
 
 
 def ensure_dirs():
-    os.makedirs(DATA_DIR, exist_ok=True)
-    os.makedirs(GPX_DIR, exist_ok=True)
+    for path in (DATA_DIR, RAW_DIR, GPX_DIR):
+        path.mkdir(parents=True, exist_ok=True)
+
+
+def make_session():
+    session = requests.Session()
+    retry = Retry(total=4, connect=4, read=4, backoff_factor=1.0,
+                  status_forcelist=(429, 500, 502, 503, 504), allowed_methods=("GET", "POST"))
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+    return session
 
 
 def init_db():
-    """初始化数据库"""
     conn = sqlite3.connect(DB_PATH)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS activities (
             run_id INTEGER PRIMARY KEY,
-            name TEXT, distance REAL, moving_time REAL, elapsed_time REAL,
-            type TEXT, subtype TEXT, start_date TEXT, start_date_local TEXT,
-            location_country TEXT, summary_polyline TEXT, average_heartrate REAL,
-            average_speed REAL, elevation_gain REAL, map TEXT
+            keep_log_id TEXT,
+            keep_sport_type TEXT,
+            keep_data_type TEXT,
+            name TEXT,
+            distance REAL,
+            moving_time REAL,
+            elapsed_time REAL,
+            type TEXT,
+            subtype TEXT,
+            start_date TEXT,
+            start_date_local TEXT,
+            timezone TEXT,
+            location_country TEXT,
+            summary_polyline TEXT,
+            average_heartrate REAL,
+            max_heartrate REAL,
+            calories REAL,
+            average_speed REAL,
+            elevation_gain REAL,
+            map TEXT,
+            raw_path TEXT,
+            synced_at TEXT
         )
     """)
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(activities)")}
+    migrations = {
+        "keep_log_id": "TEXT", "keep_sport_type": "TEXT", "keep_data_type": "TEXT",
+        "timezone": "TEXT", "max_heartrate": "REAL", "calories": "REAL",
+        "raw_path": "TEXT", "synced_at": "TEXT",
+    }
+    for column, sql_type in migrations.items():
+        if column not in existing:
+            conn.execute(f"ALTER TABLE activities ADD COLUMN {column} {sql_type}")
     conn.commit()
     return conn
 
 
-def adjust_time(dt, tz_name):
-    """调整时区"""
-    if not tz_name:
-        return dt
-    try:
-        from datetime import timezone as tz
-        offset_hours = int(tz_name) if tz_name.lstrip('-').isdigit() else 0
-        return dt + timedelta(hours=offset_hours)
-    except:
-        return dt
-
-
 def login(session, mobile, password):
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
         "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
     }
-    data = {"mobile": mobile, "password": password}
-    r = session.post(LOGIN_API, headers=headers, data=data)
-    if r.ok:
-        token = r.json()["data"]["token"]
-        headers["Authorization"] = f"Bearer {token}"
-        return session, headers
-    return None, None
+    response = session.post(LOGIN_API, headers=headers, data={"mobile": mobile, "password": password}, timeout=30)
+    response.raise_for_status()
+    token = response.json()["data"]["token"]
+    headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def get_all_run_ids(session, headers, sport_type):
-    """获取所有运动记录 ID"""
-    last_date = 0
-    result = []
+    last_date, result, seen_pages = 0, [], set()
     while True:
-        r = session.get(RUN_DATA_API.format(sport_type=sport_type, last_date=last_date), headers=headers)
-        if r.ok:
-            run_logs = r.json()["data"]["records"]
-            for i in run_logs:
-                logs = [j["stats"] for j in i["logs"]]
-                result.extend(k["id"] for k in logs if not k.get("isDoubtful"))
-            last_date = r.json()["data"]["lastTimestamp"]
-            if not last_date:
-                break
-            time.sleep(1)
-    return result
+        response = session.get(RUN_DATA_API.format(sport_type=sport_type, last_date=last_date), headers=headers, timeout=30)
+        response.raise_for_status()
+        payload = response.json()["data"]
+        for record in payload.get("records", []):
+            for log in record.get("logs", []):
+                stats = log.get("stats", {})
+                if stats.get("id") and not stats.get("isDoubtful"):
+                    result.append(stats["id"])
+        next_date = payload.get("lastTimestamp")
+        if not next_date or next_date == last_date or next_date in seen_pages:
+            break
+        seen_pages.add(next_date)
+        last_date = next_date
+        time.sleep(0.5)
+    return list(dict.fromkeys(result))
 
 
 def decode_data(text, is_geo=False):
-    """解码 Keep 数据"""
-    _bytes = base64.b64decode(text)
-    key = "NTZmZTU5OzgyZjpkODczYw=="
-    iv = "MjM0Njg5MjQzMjkyMDMwMA=="
+    raw = base64.b64decode(text)
     if is_geo:
-        cipher = AES.new(base64.b64decode(key), AES.MODE_CBC, base64.b64decode(iv))
-        _bytes = cipher.decrypt(_bytes)
-    return json.loads(zlib.decompress(_bytes, 16 + zlib.MAX_WBITS))
+        key = base64.b64decode("NTZmZTU5OzgyZjpkODczYw==")
+        iv = base64.b64decode("MjM0Njg5MjQzMjkyMDMwMA==")
+        raw = AES.new(key, AES.MODE_CBC, iv).decrypt(raw)
+    return json.loads(zlib.decompress(raw, 16 + zlib.MAX_WBITS))
 
 
-def parse_run(session, headers, run_id, sport_type, old_gpx_ids):
-    """解析单条运动记录"""
-    r = session.get(RUN_LOG_API.format(sport_type=sport_type, run_id=run_id), headers=headers)
-    if not r.ok:
-        return None
-    
-    run_data = r.json()["data"]
-    keep_id = run_data["id"].split("_")[1]
-    
-    start_time = run_data["startTime"]
-    avg_hr = None
-    elevation_gain = None
-    run_points_data = []
-    
-    # 心率数据
-    if run_data.get("heartRate"):
-        avg_hr = run_data["heartRate"].get("averageHeartRate")
-        if avg_hr and avg_hr < 0:
-            avg_hr = None
-    
-    # GPS 数据
-    if run_data.get("geoPoints"):
-        run_points_data = decode_data(run_data["geoPoints"], True)
-        run_points_data_gpx = run_points_data
-        
-        if TRANS_GCJ02_TO_WGS84:
-            run_points_data = [
-                list(eviltransform.gcj2wgs(p["latitude"], p["longitude"]))
-                for p in run_points_data
-            ]
-            for i, p in enumerate(run_points_data_gpx):
-                p["latitude"] = run_points_data[i][0]
-                p["longitude"] = run_points_data[i][1]
-        
-        # 生成 GPX
-        data_type = run_data.get("dataType", "")
-        sport = KEEP2STRAVA.get(data_type, "Workout")
-        if data_type.startswith("outdoor") or data_type == "mountaineering":
-            if keep_id not in old_gpx_ids:
-                gpx = create_gpx(run_points_data_gpx, start_time, sport)
-                save_gpx(gpx, keep_id)
-    
-    polyline_str = polyline.encode(run_points_data) if run_points_data else ""
-    start_date = datetime.fromtimestamp(start_time // 1000, tz=timezone.utc)
-    tz_name = run_data.get("timezone", "")
-    start_date_local = adjust_time(start_date, tz_name)
-    
-    distance = run_data.get("distance") or 0
-    duration = run_data.get("duration") or 0
-    avg_speed = distance / duration if duration > 0 else 0
-    
-    return {
-        "run_id": int(keep_id),
-        "name": f"{sport} from keep",
-        "distance": distance,
-        "moving_time": duration,
-        "type": sport,
-        "subtype": sport,
-        "start_date": start_date.strftime("%Y-%m-%d %H:%M:%S"),
-        "start_date_local": start_date_local.strftime("%Y-%m-%d %H:%M:%S"),
-        "location_country": str(run_data.get("region", "")),
-        "summary_polyline": polyline_str,
-        "average_heartrate": int(avg_hr) if avg_hr else None,
-        "average_speed": avg_speed,
-        "elevation_gain": elevation_gain,
-        "map": polyline_str[:200] if polyline_str else "",
-    }
+def local_datetime(start_ms, tz_value):
+    utc_dt = datetime.fromtimestamp(start_ms / 1000, tz=timezone.utc)
+    try:
+        offset = int(tz_value) if str(tz_value).lstrip("-").isdigit() else 0
+    except (TypeError, ValueError):
+        offset = 0
+    return utc_dt, utc_dt + timedelta(hours=offset)
 
 
-def create_gpx(points_data, start_time, sport_type):
-    """创建 GPX 文件"""
-    gpx = gpxpy.gpx.GPX()
-    gpx_track = gpxpy.gpx.GPXTrack()
-    gpx_track.name = "keep"
-    gpx_track.type = sport_type
-    gpx.tracks.append(gpx_track)
-    gpx_segment = gpxpy.gpx.GPXTrackSegment()
-    gpx_track.segments.append(gpx_segment)
-    
-    ts_threshold = 3_600_000
-    start_ts = 0 if (points_data and points_data[0].get("timestamp", 0) > ts_threshold) else start_time
-    
-    for p in points_data:
+def first_number(obj, paths):
+    for path in paths:
+        value = obj
+        try:
+            for key in path:
+                value = value[key]
+        except (KeyError, TypeError):
+            continue
+        if isinstance(value, (int, float)) and value >= 0:
+            return value
+    return None
+
+
+def save_raw(sport_type, keep_id, payload):
+    target_dir = RAW_DIR / sport_type
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / f"{keep_id}.json"
+    target.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return str(target.relative_to(ROOT))
+
+
+def create_gpx(points, start_time, sport_type):
+    gpx = gpxpy.gpx.GPX(); track = gpxpy.gpx.GPXTrack(); segment = gpxpy.gpx.GPXTrackSegment()
+    track.name, track.type = "keep", sport_type
+    gpx.tracks.append(track); track.segments.append(segment)
+    threshold = 3_600_000
+    start_ts = 0 if points and points[0].get("timestamp", 0) > threshold else start_time
+    for p in points:
         ts = p.get("timestamp", 0)
-        time = datetime.fromtimestamp(start_ts // 1000 + ts // 10, tz=timezone.utc)
         point = gpxpy.gpx.GPXTrackPoint(
-            latitude=p["latitude"], longitude=p["longitude"], time=time,
-            elevation=p.get("altitude")
-        )
+            latitude=p["latitude"], longitude=p["longitude"],
+            time=datetime.fromtimestamp(start_ts / 1000 + ts / 10, tz=timezone.utc), elevation=p.get("altitude"))
         if p.get("hr"):
-            ext = ET.fromstring(f'<gpxtpx:TrackPointExtension xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"><gpxtpx:hr>{p["hr"]}</gpxtpx:hr></gpxtpx:TrackPointExtension>')
-            point.extensions.append(ext)
-        gpx_segment.points.append(point)
+            point.extensions.append(ET.fromstring(
+                f'<gpxtpx:TrackPointExtension xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"><gpxtpx:hr>{p["hr"]}</gpxtpx:hr></gpxtpx:TrackPointExtension>'))
+        segment.points.append(point)
     return gpx
 
 
-def save_gpx(gpx, run_id):
-    """保存 GPX 文件"""
-    with open(os.path.join(GPX_DIR, f"{run_id}.gpx"), "w", encoding="utf-8") as f:
-        f.write(gpx.to_xml())
+def parse_run(session, headers, run_id, sport_type, refresh_raw=False):
+    response = session.get(RUN_LOG_API.format(sport_type=sport_type, run_id=run_id), headers=headers, timeout=30)
+    response.raise_for_status()
+    envelope = response.json()
+    run_data = envelope["data"]
+    keep_id = str(run_data["id"]).split("_")[-1]
+    raw_path = save_raw(sport_type, keep_id, envelope)
+
+    start_time = run_data.get("startTime") or 0
+    data_type = run_data.get("dataType", "")
+    activity_type = KEEP2ACTIVITY.get(data_type, "Workout")
+    points, polyline_str = [], ""
+    if run_data.get("geoPoints"):
+        points = decode_data(run_data["geoPoints"], True)
+        gpx_points = [dict(p) for p in points]
+        if TRANS_GCJ02_TO_WGS84:
+            coords = [eviltransform.gcj2wgs(p["latitude"], p["longitude"]) for p in points]
+            for p, (lat, lon) in zip(points, coords):
+                p["latitude"], p["longitude"] = lat, lon
+            for p, (lat, lon) in zip(gpx_points, coords):
+                p["latitude"], p["longitude"] = lat, lon
+        polyline_str = polyline.encode([[p["latitude"], p["longitude"]] for p in points])
+        if data_type.startswith("outdoor") or data_type == "mountaineering":
+            (GPX_DIR / f"{keep_id}.gpx").write_text(create_gpx(gpx_points, start_time, activity_type).to_xml(), encoding="utf-8")
+
+    distance = float(run_data.get("distance") or 0)
+    duration = float(run_data.get("duration") or 0)
+    heart = run_data.get("heartRate") or {}
+    avg_hr = first_number(run_data, [("heartRate", "averageHeartRate"), ("averageHeartRate",)])
+    max_hr = first_number(run_data, [("heartRate", "maxHeartRate"), ("maxHeartRate",)])
+    calories = first_number(run_data, [("calories",), ("calorie",), ("kilocalorie",), ("stats", "calories")])
+    utc_dt, local_dt = local_datetime(start_time, run_data.get("timezone", ""))
+
+    return {
+        "run_id": int(keep_id), "keep_log_id": str(run_data.get("id", run_id)),
+        "keep_sport_type": sport_type, "keep_data_type": data_type,
+        "name": f"{activity_type} from keep", "distance": distance,
+        "moving_time": duration, "elapsed_time": duration, "type": activity_type, "subtype": activity_type,
+        "start_date": utc_dt.strftime("%Y-%m-%d %H:%M:%S"),
+        "start_date_local": local_dt.strftime("%Y-%m-%d %H:%M:%S"), "timezone": str(run_data.get("timezone", "")),
+        "location_country": str(run_data.get("region", "")), "summary_polyline": polyline_str,
+        "average_heartrate": avg_hr, "max_heartrate": max_hr, "calories": calories,
+        "average_speed": distance / duration if duration else 0, "elevation_gain": None,
+        "map": polyline_str[:200], "raw_path": raw_path,
+        "synced_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
 
 
-def run_sync(mobile, password):
-    """执行同步"""
-    print(f"登录 Keep: {mobile[:3]}***{mobile[-4:]}")
-    s = requests.Session()
-    s, headers = login(s, mobile, password)
-    if not headers:
-        print("登录失败!")
-        return 0
-    
-    conn = init_db()
-    cur = conn.cursor()
-    cur.execute("SELECT run_id FROM activities")
-    existing_ids = {str(row[0]) for row in cur.fetchall()}
-    old_gpx_ids = set(f.split(".")[0] for f in os.listdir(GPX_DIR) if not f.startswith("."))
-    
-    new_count = 0
-    for sport_type in KEEP_SPORT_TYPES:
-        print(f"同步 {sport_type}...")
-        run_ids = get_all_run_ids(s, headers, sport_type)
-        new_ids = [rid for rid in run_ids if rid.split("_")[1] not in existing_ids]
-        print(f"  {len(run_ids)} 总记录, {len(new_ids)} 新增")
-        
-        for rid in new_ids:
-            print(f"  处理 {rid}")
-            try:
-                data = parse_run(s, headers, rid, sport_type, old_gpx_ids)
-                if data:
-                    cur.execute("""INSERT OR REPLACE INTO activities 
-                        (run_id, name, distance, moving_time, type, subtype, start_date, 
-                         start_date_local, location_country, summary_polyline, average_heartrate, 
-                         average_speed, elevation_gain, map)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (data["run_id"], data["name"], data["distance"], data["moving_time"],
-                         data["type"], data["subtype"], data["start_date"], data["start_date_local"],
-                         data["location_country"], data["summary_polyline"], data["average_heartrate"],
-                         data["average_speed"], data["elevation_gain"], data["map"]))
-                    new_count += 1
-                    existing_ids.add(str(data["run_id"]))
-            except Exception as e:
-                print(f"  错误: {e}")
-            time.sleep(0.5)
-    
-    conn.commit()
-    
-    # 导出 JSON
-    cur.execute("SELECT * FROM activities ORDER BY start_date DESC")
+def upsert(conn, data):
+    columns = list(data)
+    placeholders = ",".join("?" for _ in columns)
+    updates = ",".join(f"{c}=excluded.{c}" for c in columns if c != "run_id")
+    conn.execute(f"INSERT INTO activities ({','.join(columns)}) VALUES ({placeholders}) ON CONFLICT(run_id) DO UPDATE SET {updates}", [data[c] for c in columns])
+
+
+def export_json(conn):
+    cur = conn.execute("SELECT * FROM activities ORDER BY start_date DESC")
     cols = [d[0] for d in cur.description]
     rows = [dict(zip(cols, row)) for row in cur.fetchall()]
-    with open(JSON_PATH, "w", encoding="utf-8") as f:
-        json.dump(rows, f, ensure_ascii=False, indent=2, default=str)
-    
-    conn.close()
-    return new_count
+    JSON_PATH.write_text(json.dumps(rows, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
 
 
-def print_summary():
-    """打印统计"""
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM activities")
-    total = cur.fetchone()[0]
-    cur.execute("SELECT SUM(distance) FROM activities")
-    dist = cur.fetchone()[0] or 0
-    cur.execute("SELECT type, COUNT(*) FROM activities GROUP BY type ORDER BY COUNT(*) DESC")
-    types = cur.fetchall()
-    conn.close()
-    
-    print(f"\n{'='*50}")
-    print(f"  同步完成! 共 {total} 条记录, {dist/1000:.1f} km")
-    print(f"  按类型: " + ", ".join(f"{t}({c})" for t, c in types))
-    print(f"{'='*50}")
-    print(f"  数据库: {DB_PATH}")
-    print(f"  JSON:   {JSON_PATH}")
+def run_sync(mobile, password, refresh_raw=False):
+    ensure_dirs(); session = make_session(); headers = login(session, mobile, password); conn = init_db()
+    existing = {str(r[0]) for r in conn.execute("SELECT run_id FROM activities")}
+    changed = 0
+    for sport_type in KEEP_SPORT_TYPES:
+        ids = get_all_run_ids(session, headers, sport_type)
+        targets = ids if refresh_raw else [rid for rid in ids if str(rid).split("_")[-1] not in existing]
+        print(f"{sport_type}: {len(ids)} total, {len(targets)} to fetch")
+        for rid in targets:
+            try:
+                data = parse_run(session, headers, rid, sport_type, refresh_raw)
+                upsert(conn, data); existing.add(str(data["run_id"])); changed += 1
+            except Exception as exc:
+                print(f"WARN {sport_type}/{rid}: {exc}")
+            time.sleep(0.25)
+        conn.commit()
+    export_json(conn); total = conn.execute("SELECT COUNT(*) FROM activities").fetchone()[0]; conn.close()
+    print(f"Keep sync complete: {total} activities, {changed} fetched/updated")
+    return changed
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Keep activity ingestion")
+    parser.add_argument("mobile", nargs="?", default=os.getenv("KEEP_MOBILE"))
+    parser.add_argument("password", nargs="?", default=os.getenv("KEEP_PASSWORD"))
+    parser.add_argument("--refresh-raw", action="store_true", help="Re-fetch all historical detail responses and preserve raw JSON")
+    args = parser.parse_args()
+    if not args.mobile or not args.password:
+        parser.error("Keep credentials are required via arguments or KEEP_MOBILE/KEEP_PASSWORD")
+    run_sync(args.mobile, args.password, args.refresh_raw)
 
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description="Keep 运动数据同步")
-    parser.add_argument("mobile", help="Keep 手机号")
-    parser.add_argument("password", help="Keep 密码")
-    args = parser.parse_args()
-    
-    ensure_dirs()
-    count = run_sync(args.mobile, args.password)
-    if count > 0:
-        print_summary()
-    else:
-        print("没有新增数据")
+    main()
