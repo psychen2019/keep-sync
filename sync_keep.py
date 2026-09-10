@@ -314,10 +314,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     ensure_dirs()
-    
     count = run_sync(args.mobile, args.password)
-    
-    count = run_sync(mobile, password)
     if count > 0:
         print_summary()
     else:
