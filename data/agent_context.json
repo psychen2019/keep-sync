@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-19T22:10:13+00:00",
+  "generated_at": "2026-11-20T21:49:48+00:00",
   "purpose": "Compact factual context for AI. Prefer this before raw/session data.",
   "semantics": {
     "primary_activity": {
@@ -22,7 +22,7 @@
       "calories": null,
       "distance_km": 2.08
     },
-    "days_since_any_activity": 104,
+    "days_since_any_activity": 105,
     "latest_primary_activity": {
       "id": 9223370255325028807,
       "date": "2026-06-15 20:51:49",
@@ -34,7 +34,7 @@
       "calories": null,
       "distance_km": 0.0
     },
-    "days_since_primary_activity": 157
+    "days_since_primary_activity": 158
   },
   "windows": {
     "7": {
@@ -81,18 +81,18 @@
     },
     "365": {
       "all": {
-        "sessions": 28,
-        "total_minutes": 943.1,
-        "median_session_minutes": 39.0,
+        "sessions": 27,
+        "total_minutes": 928.8,
+        "median_session_minutes": 39.3,
         "avg_hr": 122.2,
-        "hr_coverage_percent": 78.6
+        "hr_coverage_percent": 81.5
       },
       "primary": {
-        "sessions": 26,
-        "total_minutes": 871.9,
-        "median_session_minutes": 39.0,
+        "sessions": 25,
+        "total_minutes": 857.6,
+        "median_session_minutes": 39.3,
         "avg_hr": 123.0,
-        "hr_coverage_percent": 76.9
+        "hr_coverage_percent": 80.0
       }
     }
   },
